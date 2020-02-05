@@ -10,17 +10,16 @@ import {
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
-class Customer extends Component {
+class Owner extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      clientId: "",
-      clientModels: [],
-      modelName: "",
-      modelStatus: "",
-      modelTime: "",
-      modelCost: "",
-      isLoading: true
+      ownerName : '',
+      studentBooks : [],
+      bookTitle : '',
+      bookPages : '',
+      bookUserCount : '',
+      isLoading: false
     };
   }
 
@@ -28,11 +27,11 @@ class Customer extends Component {
     this._retrieveData();
   }
 
-  addModel = () => {
+  addBook = () => {
     this.setState({
       isLoading: false
     });
-    fetch("http://192.168.0.45:2901/model/", {
+    fetch("http://192.168.43.227:2501/book/", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -40,21 +39,20 @@ class Customer extends Component {
       },
 
       body: JSON.stringify({
-        model: this.state.modelName,
-        status: this.state.modelStatus,
-        client: this.state.clientId,
-        time: this.state.modelTime,
-        cost: this.state.modelCost
+        title : this.state.bookTitle,
+        student : this.state.ownerName,
+        pages : this.state.bookPages,
+        usedCount : this.state.bookUserCount
       })
     })
       .then(response => response.json())
       .then(responseJson => {
         if (responseJson.status === 200) {
-          this.onlineGetAllModels();
+          this.getAllBooks();
         }
         console.log(responseJson);
       })
-      .then(this.onlineGetAllModels())
+      .then(this.getAllBooks())
       .then(
         this.setState({
           isLoading: true
@@ -64,11 +62,10 @@ class Customer extends Component {
         console.error(error);
       });
   };
-  saveClientId = id => {
-    console.log("save client id", id);
+  saveOwnerName = text => {
     this.setState(
       {
-        clientId: id
+        ownerName: text
       },
       () => this._storeData()
     );
@@ -76,10 +73,7 @@ class Customer extends Component {
 
   _storeData = async () => {
     try {
-      console.log("store data", this.state.clientId);
-      await AsyncStorage.setItem("clientId", this.state.clientId);
-      const value = await AsyncStorage.getItem("clientId");
-      console.log("saved value is", value);
+      await AsyncStorage.setItem("ownerName", this.state.ownerName);
     } catch (error) {
       // Error saving data
     }
@@ -87,21 +81,21 @@ class Customer extends Component {
 
   _retrieveData = async () => {
     try {
-      const value = await AsyncStorage.getItem("clientId");
+      const value = await AsyncStorage.getItem("ownerName");
       if (value !== null) {
         // We have data!!
         this.setState({
-          clientId: value
+          ownerName: value
         });
-        this.onlineGetAllModels();
+        this.getAllBooks();
       }
     } catch (error) {
       // Error retrieving data
     }
   };
 
-  onlineGetAllModels = () => {
-    fetch("http://192.168.0.45:2901/models/" + this.state.clientId, {
+  getAllBooks = () => {
+    fetch("http://192.168.43.227:2501/books/" + this.state.ownerName, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -111,7 +105,7 @@ class Customer extends Component {
       .then(response => response.json())
       .then(responseJson => {
         this.setState({
-          clientModels: responseJson,
+          studentBooks: responseJson,
           isLoading: false
         });
       })
@@ -138,7 +132,7 @@ class Customer extends Component {
       <View
         style={{
           flexDirection: "column",
-          marginTop: 200
+          marginTop: 50
         }}
       >
         <View
@@ -147,19 +141,21 @@ class Customer extends Component {
             justifyContent: "space-evenly"
           }}
         >
-          <Text>Your id:</Text>
+          <Text>Client name:</Text>
           <TextInput
             style={{
               width: 100
             }}
-            placeholder="Id"
-            onChangeText={text => this.saveClientId(text)}
-            value={this.state.clientId}
+            placeholder="Client Name"
+            onChangeText={text => this.saveOwnerName(text)}
+            value={this.state.ownerName}
           />
         </View>
-        <ScrollView>
+        <ScrollView style={{
+          height: 200
+        }}>
           <FlatList
-            data={this.state.clientModels}
+            data={this.state.studentBooks}
             renderItem={({ item }) => (
               <View
                 style={{
@@ -167,8 +163,8 @@ class Customer extends Component {
                   justifyContent: "space-evenly"
                 }}
               >
-                <Text>Model Name:{item.model}</Text>
-                <Text>Model Cost:{item.cost}</Text>
+                <Text ellipsizeMode="tail" numberOfLines={1} style={{width : 100}}>{item.title}</Text>
+                <Text>Status:{item.status}</Text>
               </View>
             )}
             keyExtractor={item => item.id.toString()}
@@ -180,34 +176,26 @@ class Customer extends Component {
           }}
         >
           <TextInput
-            placeholder="Model Name"
+            placeholder="Book title"
             onChangeText={text =>
               this.setState({
-                modelName: text
+                bookTitle: text
               })
             }
           ></TextInput>
           <TextInput
-            placeholder="Model Status"
+            placeholder="Pages"
             onChangeText={text =>
               this.setState({
-                modelStatus: text
+                bookPages: text
               })
             }
           ></TextInput>
           <TextInput
-            placeholder="Time for print"
+            placeholder="Used count"
             onChangeText={text =>
               this.setState({
-                modelTime: text
-              })
-            }
-          ></TextInput>
-          <TextInput
-            placeholder="Model Cost"
-            onChangeText={text =>
-              this.setState({
-                modelCost: text
+                bookUserCount: text
               })
             }
           ></TextInput>
@@ -217,7 +205,7 @@ class Customer extends Component {
               alignItems: "center"
             }}
           >
-            <Button title="Add Model" onPress={this.addModel}></Button>
+            <Button title="Add Book" onPress={this.addBook}></Button>
           </View>
         </View>
       </View>
@@ -225,4 +213,4 @@ class Customer extends Component {
   }
 }
 
-export default Customer;
+export default Owner;

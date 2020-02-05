@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import { Alert } from "react-native";
 import { createSwitchNavigator, createAppContainer } from "react-navigation";
 import Home from "./Home";
-import Customer from "./Customer";
+import Owner from "./Owner";
 import Manager from "./Manager";
-import Employee from "./Employee";
+import Borrow from "./Borrow";
 
 export default class Index extends Component {
   render() {
@@ -12,7 +12,7 @@ export default class Index extends Component {
   }
 }
 
-var ws = new WebSocket("ws://192.168.0.45:2901/");
+var ws = new WebSocket("ws://192.168.43.227:2501/");
 
 ws.onopen = () => {
   // connection opened
@@ -22,8 +22,8 @@ ws.onopen = () => {
 
 ws.onmessage = e => {
   // a message was received
-  const jsonatuJsonat = JSON.parse(e.data);
-  Alert.alert(jsonatuJsonat.model);
+  const eJson = JSON.parse(e.data);
+  Alert.alert('Title: ' + eJson.title, 'Student name: ' + eJson.student + ' ; Status : ' + eJson.status);
 };
 
 ws.onerror = e => {
@@ -38,8 +38,8 @@ ws.onclose = e => {
 
 const AppSwitchNavigator = createSwitchNavigator({
   Home: { screen: Home },
-  Customer: { screen: Customer },
-  Employee: { screen: Employee },
+  Owner: { screen: Owner },
+  Borrow: { screen: Borrow },
   Manager: { screen: Manager }
 });
 

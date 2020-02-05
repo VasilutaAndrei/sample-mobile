@@ -14,12 +14,12 @@ class Home extends Component {
         }}
       >
         <Button
-          title="Customer"
-          onPress={() => this.props.navigation.navigate("Customer")}
+          title="Owner"
+          onPress={() => this.props.navigation.navigate("Owner")}
         />
         <Button
-          title="Employee"
-          onPress={() => this.props.navigation.navigate("Employee")}
+          title="Borrow"
+          onPress={() => this.props.navigation.navigate("Borrow")}
         />
         <Button
           title="Manager"
