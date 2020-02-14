@@ -6,9 +6,13 @@ import {
   AsyncStorage,
   FlatList,
   Button,
-  ActivityIndicator
+  ActivityIndicator,
+  Alert
 } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import {
+  Header
+} from 'react-native-elements';
+import { ScrollView, TouchableHighlight, TouchableOpacity } from "react-native-gesture-handler";
 
 class Owner extends Component {
   constructor(props) {
@@ -19,11 +23,11 @@ class Owner extends Component {
       bookTitle : '',
       bookPages : '',
       bookUserCount : '',
-      isLoading: false
+      isLoading: true
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this._retrieveData();
   }
 
@@ -59,7 +63,7 @@ class Owner extends Component {
         })
       )
       .catch(error => {
-        console.error(error);
+        Alert.alert('Error:', error);
       });
   };
   saveOwnerName = text => {
@@ -75,7 +79,7 @@ class Owner extends Component {
     try {
       await AsyncStorage.setItem("ownerName", this.state.ownerName);
     } catch (error) {
-      // Error saving data
+      Alert.alert('Error:', error);
     }
   };
 
@@ -90,7 +94,7 @@ class Owner extends Component {
         this.getAllBooks();
       }
     } catch (error) {
-      // Error retrieving data
+      Alert.alert('Error:', error);
     }
   };
 
@@ -108,9 +112,10 @@ class Owner extends Component {
           studentBooks: responseJson,
           isLoading: false
         });
+        console.log(responseJson);
       })
       .catch(error => {
-        console.error(error);
+        Alert.alert('Error:', error);
       });
   };
 
@@ -129,86 +134,121 @@ class Owner extends Component {
       );
     }
     return (
-      <View
-        style={{
-          flexDirection: "column",
-          marginTop: 50
-        }}
-      >
+      <>
+        <Header
+          leftComponent={
+            <TouchableOpacity onPress={() => this.props.navigation.navigate('Home')}>
+              <Text>{'< Back'}</Text>
+            </TouchableOpacity>
+          }
+          centerComponent={{ text: 'Owner', style: { color: '#fff' } }}
+        />
         <View
           style={{
-            flexDirection: "row",
-            justifyContent: "space-evenly"
+            flexDirection: "column",
+            marginTop: 50
           }}
         >
-          <Text>Client name:</Text>
-          <TextInput
+          <View
             style={{
-              width: 100
+              flexDirection: "row",
+              justifyContent: "space-evenly"
             }}
-            placeholder="Client Name"
-            onChangeText={text => this.saveOwnerName(text)}
-            value={this.state.ownerName}
-          />
-        </View>
-        <ScrollView style={{
-          height: 200
-        }}>
+          >
+            <Text>Client name:</Text>
+            <TextInput
+              style={{
+                width: 100
+              }}
+              placeholder="Client Name"
+              onChangeText={text => this.saveOwnerName(text)}
+              value={this.state.ownerName}
+            />
+          </View>
           <FlatList
+            style={{height:200}}
             data={this.state.studentBooks}
             renderItem={({ item }) => (
               <View
                 style={{
                   flexDirection: "row",
-                  justifyContent: "space-evenly"
+                  justifyContent: "space-between",
+                  height : 35,
+                  marginHorizontal : 10
                 }}
               >
-                <Text ellipsizeMode="tail" numberOfLines={1} style={{width : 100}}>{item.title}</Text>
+                <Text ellipsizeMode="tail" numberOfLines={1} style={{width : 150}}>{item.title}</Text>
                 <Text>Status:{item.status}</Text>
               </View>
             )}
             keyExtractor={item => item.id.toString()}
           />
-        </ScrollView>
-        <View
-          style={{
-            flexDirection: "column"
-          }}
-        >
-          <TextInput
-            placeholder="Book title"
-            onChangeText={text =>
-              this.setState({
-                bookTitle: text
-              })
-            }
-          ></TextInput>
-          <TextInput
-            placeholder="Pages"
-            onChangeText={text =>
-              this.setState({
-                bookPages: text
-              })
-            }
-          ></TextInput>
-          <TextInput
-            placeholder="Used count"
-            onChangeText={text =>
-              this.setState({
-                bookUserCount: text
-              })
-            }
-          ></TextInput>
           <View
             style={{
-              justifyContent: "center",
-              alignItems: "center"
+              flexDirection: "column",
+              marginHorizontal : 10
             }}
           >
-            <Button title="Add Book" onPress={this.addBook}></Button>
+            <TextInput
+              style={{
+                borderWidth : 1,
+                padding : 5,
+                width : 390,
+                borderRadius : 5,
+                borderColor : 'black',
+                marginVertical : 7
+              }}
+              placeholder="Book title"
+              onChangeText={text =>
+                this.setState({
+                  bookTitle: text
+                })
+              }
+            ></TextInput>
+            <TextInput
+              style={{
+                borderWidth : 1,
+                padding : 5,
+                width : 390,
+                borderRadius : 5,
+                borderColor : 'black',
+                marginVertical : 7
+              }}
+              placeholder="Pages"
+              onChangeText={text =>
+                this.setState({
+                  bookPages: text
+                })
+              }
+            ></TextInput>
+            <TextInput
+              style={{
+                borderWidth : 1,
+                padding : 5,
+                width : 390,
+                borderRadius : 5,
+                borderColor : 'black',
+                marginVertical : 7
+              }}
+              placeholder="Used count"
+              onChangeText={text =>
+                this.setState({
+                  bookUserCount: text
+                })
+              }
+            ></TextInput>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <Button title="Add Book" onPress={this.addBook}></Button>
+            </View>
           </View>
         </View>
-      </View>
+      </>
+      
     );
   }
 }

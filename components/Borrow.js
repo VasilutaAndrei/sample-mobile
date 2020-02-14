@@ -1,13 +1,15 @@
 import React, { Component } from "react";
-import { View, Text, ScrollView, FlatList, Alert, Button } from "react-native";
+import { View, Text, ScrollView, FlatList, Alert, ActivityIndicator } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import {Header} from 'react-native-elements';
 
 export default class Borrow extends Component {
   constructor(props) {
     super(props);
     this.state = {
       student : '',
-      availableBooks : []
+      availableBooks : [],
+      isLoading : true
     };
   }
 
@@ -45,9 +47,10 @@ export default class Borrow extends Component {
           availableBooks: responseJson,
           isLoading: false
         });
+        console.log(responseJson);
       })
       .catch(error => {
-        console.error(error);
+        Alert.alert('Error:', error);
       });
   };
 
@@ -78,33 +81,52 @@ export default class Borrow extends Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-        console.log(responseJson);
         if (responseJson.id == bID && responseJson.status === 'borrowed') {
-          Alert.alert("Borrowed");
+          Alert.alert("Borrowed", 'You have borrowed ' + responseJson.title + '. Enjoy reading it!');
           this.getAvailableBooks();
         } else {
-          Alert.alert("Not Borrowed");
+          Alert.alert("Something went wrong.");
         }
         console.log(responseJson);
       })
       .catch(error => {
-        console.error(error);
+        Alert.alert('Error:', error);
       });
   };
 
   render() {
+    if (this.state.isLoading) {
+      return (
+        <View
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            flex: 1
+          }}
+        >
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      );
+    }
     return (
-      <View
-        style={{
-          marginTop: 50,
-          flexDirection: "column"
-        }}
-      >
-        <ScrollView style={{
-          height: 350
-        }}>
+      <>
+        <Header
+          leftComponent={
+            <TouchableOpacity onPress={() => this.props.navigation.navigate('Home')}>
+              <Text>{'< Back'}</Text>
+            </TouchableOpacity>
+          }
+          centerComponent={{ text: 'Borrow', style: { color: '#fff' } }}
+        />
+        <View
+          style={{
+            marginTop: 50,
+            flexDirection: "column"
+          }}
+        >
           <FlatList
             data={this.state.availableBooks}
+            style={{height:350}}
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={{
@@ -121,8 +143,8 @@ export default class Borrow extends Component {
             )}
             keyExtractor={item => item.id.toString()}
           />
-        </ScrollView>
-      </View>
+        </View>
+      </>
     );
   }
 }
