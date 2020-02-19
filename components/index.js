@@ -3,22 +3,18 @@ import { Alert } from "react-native";
 import { createSwitchNavigator, createAppContainer } from "react-navigation";
 import Home from "./Home";
 import Owner from "./Owner";
-import Report from "./Report";
+import Reports from "./Reports";
 import Borrow from "./Borrow";
+import Registration from "./Registration";
+import Driver from "./Driver";
 
 export default class Index extends Component {
-  constructor(props){
-    super(props);
-    this.state={
-      socketEntry : []
-    }
-  }
   render() {
     return <AppContainer />;
   }
 }
 
-var ws = new WebSocket("ws://192.168.43.227:2501/");
+var ws = new WebSocket("ws://192.168.0.100:1957/");
 
 ws.onopen = () => {
   ws.send("connected");
@@ -26,9 +22,7 @@ ws.onopen = () => {
 
 ws.onmessage = e => {
   const eJson = JSON.parse(e.data);
-  let newEntries = this.state.socketEntry;
-  newEntries.push(eJson);
-  Alert.alert('Title: ' + eJson.title, 'Student name: ' + eJson.student + ' ; Status : ' + eJson.status);
+  Alert.alert('Name: ' + eJson.name, 'Driver: ' + eJson.driver + ' ; Status : ' + eJson.status);
 };
 
 ws.onerror = e => {
@@ -43,7 +37,9 @@ const AppSwitchNavigator = createSwitchNavigator({
   Home: { screen: Home },
   Owner: { screen: Owner },
   Borrow: { screen: Borrow },
-  Report: { screen: Report }
+  Reports: { screen: Reports },
+  Registration: {screen: Registration},
+  Driver:{screen: Driver}
 });
 
 const AppContainer = createAppContainer(AppSwitchNavigator);

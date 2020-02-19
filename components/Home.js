@@ -15,20 +15,26 @@ class Home extends Component {
       >
         <Button
           color='green'
-          title="Owner"
-          onPress={() => this.props.navigation.navigate("Owner")}
+          title="Registration"
+          onPress={() => this.props.navigation.navigate("Registration")}
         />
         <Separator/>
         <Button
           color='green'
-          title="Borrow"
-          onPress={() => this.props.navigation.navigate("Borrow")}
+          title="Manage"
+          onPress={() => this.props.navigation.navigate("Manage")}
         />
         <Separator/>
         <Button
           color='green'
-          title="Report"
-          onPress={() => this.props.navigation.navigate("Report")}
+          title="Reports"
+          onPress={() => this.props.navigation.navigate("Reports")}
+        />
+        <Separator/>
+        <Button
+          color='green'
+          title="Driver"
+          onPress={() => this.props.navigation.navigate("Driver")}
         />
       </View>
     );

@@ -3,36 +3,42 @@ import { View, FlatList, ScrollView, Text, ActivityIndicator, TouchableOpacity }
 import { TouchableHighlight } from "react-native-gesture-handler";
 import { Header } from "react-native-elements";
 
-export default class Report extends Component {
+export default class Reports extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      allBooks: [],
+      cabs: [],
       sortedBooks: [],
       isLoading: true
     };
   }
 
   componentDidMount() {
-    this.getAllBooks();
+    this.getAllCabs();
   }
 
-  sortByCount = books => {
-    let filteredBooks = books.map(book => {
-      return { id: book.id, title: book.title, usedCount: book.usedCount };
+  sortBySize = cabs => {
+    cabs.sort(function(a, b) {
+      return parseInt(b.size, 10) - parseInt(a.size, 10);
     });
 
-    filteredBooks.sort(function(a, b) {
-      return parseInt(b.usedCount, 10) - parseInt(a.usedCount, 10);
-    });
-
-    let toReturn = filteredBooks.slice(0, 10);
+    let toReturn = cabs.slice(0, 10);
 
     return toReturn;
   };
 
-  getAllBooks = () => {
-    fetch("http://192.168.43.227:2501/all/", {
+  sortByCapacity = cabs => {
+    cabs.sort(function(a, b) {
+      return parseInt(b.capacity, 10) - parseInt(a.capacity, 10);
+    });
+
+    let toReturn = cabs.slice(0, 5);
+
+    return toReturn;
+  }
+
+  getAllCabs = () => {
+    fetch("http://192.168.0.100:1957/all", {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -41,9 +47,11 @@ export default class Report extends Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-        const sortedByCount = this.sortByCount(responseJson);
+        const sortedBySize = this.sortBySize(responseJson);
+        const sortedByCapacity = this.sortByCapacity(responseJson);
         this.setState({
-          sortedBooks: sortedByCount,
+          sortedBySize: sortedBySize,
+          sortedByCapacity : sortedByCapacity,
           isLoading : false
         });
         console.log(responseJson);
@@ -75,7 +83,7 @@ export default class Report extends Component {
               <Text>{'< Back'}</Text>
             </TouchableOpacity>
           }
-          centerComponent={{ text: 'Report', style: { color: '#fff' } }}
+          centerComponent={{ text: 'Reports', style: { color: '#fff' } }}
         />
         <View
           style={{
@@ -88,10 +96,10 @@ export default class Report extends Component {
               marginBottom: 10
             }}
           >
-            Ordered by count
+            Ordered by Size
           </Text>
           <FlatList
-            data={this.state.sortedBooks}
+            data={this.state.sortedBySize}
             renderItem={({ item }) => (
               <View
                 style={{
@@ -101,8 +109,39 @@ export default class Report extends Component {
                   marginHorizontal : 10
                 }}
               >
-                <Text ellipsizeMode="tail" numberOfLines={1} style={{width : 200}}>{item.title}</Text>
-                <Text>Used Count:{item.usedCount}</Text>
+              <Text>Name:{item.name} Status:{item.status} Size:{item.size} Driver:{item.driver}</Text>
+              </View>
+            )}
+            keyExtractor={item => item.id.toString()}
+          />
+        
+        </View>
+        <View
+          style={{
+            marginTop: 50
+          }}
+        >
+          <Text
+            style={{
+              marginTop: 10,
+              marginBottom: 10
+            }}
+          >
+            Ordered by capacity
+          </Text>
+          <FlatList
+            data={this.state.sortedByCapacity}
+            renderItem={({ item }) => (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  height : 35,
+                  marginHorizontal : 10
+                }}
+              >
+                <Text ellipsizeMode="tail" numberOfLines={1} style={{width : 200}}>Name:{item.name}</Text>
+                <Text>Capacity:{item.capacity}</Text>
               </View>
             )}
             keyExtractor={item => item.id.toString()}
